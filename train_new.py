@@ -8,9 +8,50 @@ from math import radians, sin, cos, sqrt, atan2
 import socket
 import time
 
-#send data format, GPS, trackid
+
+my_dict = {}
+def generate_dict():
+
+    key = b'61d0'
+    gps = [38.897701, -77.036552] 
+    track_id = 7
+    my_dict[key] = [gps, track_id]
+
+    key = b'61d1'
+    gps = [23.66, 4.53] 
+    track_id = 7            
+    my_dict[key] = [gps, track_id]
+
+    key = b'61d2'
+    gps = [56.44, -74.02] 
+    track_id = 7            
+    my_dict[key] = [gps, track_id]
+
+    key = b'61d3'
+    gps = [73.80, 153.56] 
+    track_id = 7            
+    my_dict[key] = [gps, track_id]
+
+    key = b'61d4'
+    gps = [49.12, -33.71] 
+    track_id = 7            
+    my_dict[key] = [gps, track_id]
+
+    key = b'61d5'
+    gps = [-47.97, 144.98] 
+    track_id = 7            
+    my_dict[key] = [gps, track_id]
+
+    key = b'61d6'
+    gps = [-78.87,-32.05] 
+    track_id = 7            
+    my_dict[key] = [gps, track_id]
+    
+
+
 def reader():
-    return random()
+    tags=[b'61d0',b'61d1',b'61d2',b'61d3',b'61d4',b'61d5',b'61d6']
+    return tags[int(random()*7)]
 
 def rfid_reader(queue):
     old_data=0
@@ -19,7 +60,7 @@ def rfid_reader(queue):
         if data!=old_data:
             old_data=data
             sleep(2)
-            queue.put(data)
+            queue.put(my_dict[data])
             print("put data",data)
 
 def sender(queue):
