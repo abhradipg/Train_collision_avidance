@@ -87,6 +87,7 @@ if __name__ == '__main__':
     sender_process = Process(target=sender, args=(queue,))
     sender_process.start()
     reciver_process = Process(target=reciver)
+    reciver_process.start()
     reader_process.join()
     sender_process.join()
     reciver_process.join()
