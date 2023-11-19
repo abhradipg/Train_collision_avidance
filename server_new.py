@@ -28,7 +28,8 @@ def sender(train_table,queue):
         except:
             queue_empty=1
 
-
+        if queue_empty==0:
+            
     return 0
 
 if __name__ == '__main__':
