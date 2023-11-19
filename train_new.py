@@ -8,6 +8,7 @@ import time
 from math import radians, sin, cos, sqrt, atan2
 import socket
 import time
+import ast
 
 
 my_dict = {}
@@ -55,14 +56,22 @@ def reader():
     return tags[int(random()*7)]
 
 def rfid_reader(queue):
-    old_data=0
+    old_data=''
+    file_path = 'dummy_data1.txt'
     while True:
-        data = reader()
-        if data!=old_data:
-            old_data=data
-            sleep(2)
-            queue.put(my_dict[data])
-            print("put data",data)
+        with open(file_path, 'r') as file:
+            for line in file:
+                if "'EPCData':" in line:
+                    # Convert the string representation of the dictionary to an actual dictionary
+                    data_dict = ast.literal_eval(line.strip())
+                    # Extracting the 'EPC' value and return it
+                    data=data_dict['EPCData']['EPC']
+
+                if data!=old_data:
+                    old_data=data
+                    sleep(2)
+                    queue.put(my_dict[data])
+                    print("put data",data)
 
 def sender(queue,shared_gps,lock):
     server_ip = '10.217.59.110'
