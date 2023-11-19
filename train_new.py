@@ -1,6 +1,7 @@
 from time import sleep
 from random import random
-from multiprocessing import Process
+from multiprocessing import Lock
+from multiprocessing import Process, Value, Array
 from multiprocessing import Queue
 from queue import Empty
 import time
@@ -63,7 +64,7 @@ def rfid_reader(queue):
             queue.put(my_dict[data])
             print("put data",data)
 
-def sender(queue):
+def sender(queue,shared_gps,lock):
     server_ip = '10.217.59.110'
     server_port = 2000
     server_addr = (server_ip, server_port)
@@ -78,12 +79,14 @@ def sender(queue):
     curr_ack
     rtt_approx=1
     speed=100
-    current_gps=0
 
     while True:
         try:
             queue_empty=0
             data = queue.get(block=False)
+            lock.acquire()
+            shared_gps=data[0]
+            lock.release()
         except Empty:
             queue_empty = 1
 
@@ -105,9 +108,10 @@ def sender(queue):
             except socket.timeout:
                 received_ack=0
 
-def reciver():
+def reciver(shared_gps,lock):
     server_ip = '10.217.59.110'
     server_port = 3000
+    forward_train_gps = 0
 
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -118,7 +122,8 @@ def reciver():
         segments = data.split(',')
         ack_message = segments[-1]
         server_socket.sendto(ack_message.encode(), client_address)
-        process_data(segments[:-2])
+        forward_train_gps=segments[0]
+        process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
 
 def process_data(lat1, lon1, lat2, lon2):
     # Convert latitude and longitude from degrees to radians
@@ -135,16 +140,18 @@ def process_data(lat1, lon1, lat2, lon2):
 
     # Calculate the distance
     distance = radius * c
-
+    print("distance is - "+distance)
     return distance
 
 if __name__ == '__main__':
     queue = Queue()
-    reader_process = Process(target=rfid_reader, args=(queue,))
+    shared_gps = Array('d', [0.0, 0.0])
+    lock=Lock()
+    reader_process = Process(target=rfid_reader, args=(queue))
     reader_process.start()
-    sender_process = Process(target=sender, args=(queue,))
+    sender_process = Process(target=sender, args=(queue,shared_gps,lock))
     sender_process.start()
-    reciver_process = Process(target=reciver)
+    reciver_process = Process(target=reciver, args=(shared_gps,lock))
     reciver_process.start()
     reader_process.join()
     sender_process.join()
