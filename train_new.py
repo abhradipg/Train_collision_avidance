@@ -56,11 +56,6 @@ def generate_dict():
     my_dict[key] = [gps, track_id]
     
 
-
-def reader():
-    tags=[b'61d0',b'61d1',b'61d2',b'61d3',b'61d4',b'61d5',b'61d6']
-    return tags[int(random()*7)]
-
 def rfid_reader(queue):
     generate_dict()
     old_data=''
@@ -76,9 +71,13 @@ def rfid_reader(queue):
 
                 if data!=old_data:
                     old_data=data
-                    sleep(2)
-                    queue.put(my_dict[data])
-                    print("put data",data)
+                    if data in my_dict:
+                        queue.put(my_dict[data])
+                        print("put data", data)
+                    else:
+                        # Handle the case where data is not in my_dict
+                        print(f"Data {data} not found in my_dict")
+
 
 def sender(queue,shared_gps,lock):
     server_ip = '127.0.0.1'
@@ -88,8 +87,8 @@ def sender(queue,shared_gps,lock):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
     queue_empty=0
-    data=0
-    old_data=0
+    data=[]
+    
     received_ack=0
     ack_no=0
     curr_ack=0
@@ -122,7 +121,7 @@ def sender(queue,shared_gps,lock):
             client_socket.settimeout(rtt_approx)
             try:
                 ack_data, server_address = client_socket.recvfrom(1024)
-                if server_address==server_addr and ack_data==ack_no:
+                if server_address==server_addr and ack_data==curr_ack:
                     received_ack=1
 
             except socket.timeout:
