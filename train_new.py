@@ -87,8 +87,8 @@ def sender(queue,shared_gps,lock):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
     queue_empty=0
-    data=0
-    old_data=0
+    data=[]
+    
     received_ack=0
     ack_no=0
     curr_ack=0
@@ -119,7 +119,7 @@ def sender(queue,shared_gps,lock):
             client_socket.settimeout(rtt_approx)
             try:
                 ack_data, server_address = client_socket.recvfrom(1024)
-                if server_address==server_addr and ack_data==ack_no:
+                if server_address==server_addr and ack_data==curr_ack:
                     received_ack=1
 
             except socket.timeout:
