@@ -95,6 +95,7 @@ def sender(queue,shared_gps,lock):
     curr_ack=0
     rtt_approx=1
     speed=100
+    train_id=12345
 
     while True:
         try:
@@ -108,6 +109,7 @@ def sender(queue,shared_gps,lock):
 
         if queue_empty == 0:
             data.append(speed)
+            data.append(train_id)
             data.append(ack_no)
             curr_ack=ack_no
             ack_no=ack_no+1
@@ -126,7 +128,7 @@ def sender(queue,shared_gps,lock):
             except socket.timeout:
                 received_ack=0
 
-def reciver(shared_gps,lock):
+def receiver(shared_gps,lock):
     server_ip = '127.0.0.1'
     server_port = 3000
     forward_train_gps = 0
@@ -169,7 +171,7 @@ if __name__ == '__main__':
     reader_process.start()
     sender_process = Process(target=sender, args=(queue,shared_gps,lock))
     sender_process.start()
-    reciver_process = Process(target=reciver, args=(shared_gps,lock))
+    reciver_process = Process(target=receiver, args=(shared_gps,lock))
     reciver_process.start()
     reader_process.join()
     sender_process.join()
