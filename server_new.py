@@ -29,7 +29,9 @@ def sender(train_table,queue):
             queue_empty=1
 
         if queue_empty==0:
-            
+            trackid=data[1]
+            train_list=train_table[]
+
     return 0
 
 if __name__ == '__main__':
