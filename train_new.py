@@ -122,9 +122,13 @@ def process_data(lat1, lon1, lat2, lon2):
     print("distance is - "+str(distance))
     return distance
 
-def print_metrics(segments,distance):
+def print_metrics(segments,distance,speed_lock):
     train_id=segments[3]
     speed=segments[2]
+    source_ip=segments[4]
+    source_port=2500
+    server_address = (source_ip,source_port)
+
     print("Train ID: ",str(train_id)," is at location: ",str(segments[0][0]),"\u00B0 N ",str(segments[0][1]),"\u00B0 E")
     print("Speed of train is: ",str(speed),"km/hr \n")
     print("Distance between trains is: ",str(distance),"km \n")
@@ -133,11 +137,22 @@ def print_metrics(segments,distance):
         slowdown.value = 2
         speed_lock.release()
         print("Braking !!! Dangerously Close")
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect(server_address)
+        message="stop"
+        client_socket.sendall(message.encode('utf-8'))
+        client_socket.close()
+
     elif distance < 1:
         speed_lock.acquire()
         slowdown.value = 1
         speed_lock.release()
         print("Slowing down !!!")
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect(server_address)
+        message="slow"
+        client_socket.sendall(message.encode('utf-8'))
+        client_socket.close()
     
 
 
@@ -167,6 +182,7 @@ def receiver(shared_gps,curr_ack,slowdown,received_ack,ack_lock,lock,speed_lock)
                 received_ack.value=1
             ack_lock.release()
         else:
+            #segment data format [[gps],trackid,speed,train_no,sourceip,ackno]
             ack_message = [segments[-1]]
             ack_message.append(train_id)
             print("train ack")
@@ -177,8 +193,47 @@ def receiver(shared_gps,curr_ack,slowdown,received_ack,ack_lock,lock,speed_lock)
             client_port = 2000
             server_socket.sendto(ack_message, (client_ip,client_port))
             forward_train_gps=segments[0]
-            distance=process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
-            print_metrics(segments,distance)
+            lock.acquire()
+            curr_gps=[shared_gps[0],shared_gps[1]]
+            lock.release()
+            distance=process_data(curr_gps[0],curr_gps[1],forward_train_gps[0],forward_train_gps[1])
+
+            print_metrics(segments,distance,speed_lock)
+
+    def tcp_server(slowdown,speed_lock):
+        server_ip='10.192.240.106'
+        server_port=2500
+        server_address = (server_ip,server_port)
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        server_socket.bind(server_address)
+        server_socket.listen(10)
+
+        while True:
+            # Wait for a connection
+            print('Waiting for a connection...')
+            client_socket, client_address = server_socket.accept()
+            print('Accepted connection from {}:{}'.format(*client_address))
+
+            # Receive and print the data
+            data = client_socket.recv(1024)
+            if data:
+                message = data.decode('utf-8')
+                print(message)
+                if(message=="slow"):
+                    speed_lock.acquire()
+                    slowdown.value = 1
+                    speed_lock.release()
+                    print("Slowing down !!!")
+
+                elif(message=="stop"):
+                    speed_lock.acquire()
+                    slowdown.value = 2
+                    speed_lock.release()
+                    print("Braking !!! Dangerously Close")
+
+            # Close the connection
+            client_socket.close()
 
 if __name__ == '__main__':
     queue = Queue()
@@ -190,6 +245,7 @@ if __name__ == '__main__':
     lock=Lock()
     ack_lock=Lock()
     speed_lock=Lock()
+    tcp_process = Process(target=tcp_server, args=(slowdown,speed_lock))
     reader_process = Process(target=rfid_reader, args=(queue,slowdown,speed_lock))
     reader_process.start()
     sender_process = Process(target=sender, args=(queue,shared_gps,curr_ack,received_ack,ack_lock,lock))
