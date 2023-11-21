@@ -48,7 +48,7 @@ def receiver(train_table,queue,lock):
 
         tuple = [train_id,ip_addr,port_no]
 
-        lock.aquire()
+        lock.acquire()
         if track_id in train_table.keys():
             # Key already exists, append value to the existing list
             if tuple not in train_table[track_id]:
@@ -79,7 +79,7 @@ def sender(train_table,queue,lock):
 
         if queue_empty==0:
             trackid=data[1]
-            lock.aquire()
+            lock.acquire()
             train_list=train_table[trackid]
             lock.release()
 
