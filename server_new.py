@@ -9,22 +9,38 @@ import pickle
 import socket
 import time
 
-#receive data from trains and send acknowldgement back and update train-track table
+'''
+receiver
+------------
+-runs as a separate process
+-receive data from trains
+-update the train table based on the received data (delete if present on other track, add if not already present, update ACK no. if on same track)
+-put the recived data on queue to be read be sender function (which runs a separate process)
+-need to take lock for train_table as it is used by sender function
+'''
 def receiver(train_table,queue,lock):
     lock.acquire()
     train_table[0]=[0,0,0]
     lock.release()
+
+    #put our own IP and port on receiver IP and port
     print("receiver started")
     receiver_ip='10.192.241.200'
     receiver_port=2000
     sender_port=3000
    
+    #start a UDP socket connection for receiver
     receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     receiver_socket.bind((receiver_ip, receiver_port))
 
+    #start receiving data
     while True:
-        #received data is [gps,trackid,speed,trainid,ack_no]
+        '''
+        #received data is of the format 
+        [   gps,    trackid,    speed,  trainid,    ack_no  ]
+        '''
         data, client_address = receiver_socket.recvfrom(1024)
+        #unpikl the data received
         data = pickle.loads(data)
         print("data received by server-")
         print(data)
@@ -32,10 +48,12 @@ def receiver(train_table,queue,lock):
         ip_addr, port_no = client_address
         train_id = data[3]
         ack_no = [data[-1]]
-        ack_no = pickle.dumps(ack_no)
 
-        #sending acknowledgement
+        #pikl the ACK and send 
+        ack_no = pickle.dumps(ack_no)
         receiver_socket.sendto(ack_no, (ip_addr,sender_port))
+
+        #remove the entry if train was present in another track in the table
         lock.acquire()
         for tid in train_table.keys():
             if tid != track_id:
@@ -46,8 +64,8 @@ def receiver(train_table,queue,lock):
                             train_table[tid].remove(tuple)
         lock.release()
 
+        #Update the train table
         tuple = [train_id,ip_addr,port_no]
-
         lock.acquire()
         if track_id in train_table.keys():
             # Key already exists, append value to the existing list
@@ -60,6 +78,8 @@ def receiver(train_table,queue,lock):
 
         print(f"Updated table: {train_table}")
         print(data)
+
+        #pikl the data received and put in the queue to be read by sender function
         data_new=pickle.dumps(data[0:4])
         queue.put(data_new)
 
