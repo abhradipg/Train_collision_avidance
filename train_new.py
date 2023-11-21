@@ -145,28 +145,6 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
             distance=process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
             print_metrics(segments,distance)
 
-
-<<<<<<< HEAD
-=======
-def process_data(lat1, lon1, lat2, lon2):
-    # Convert latitude and longitude from degrees to radians
-    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-
-    # Haversine formula
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-    # Radius of the Earth in kilometers (change it to 3958.8 for miles)
-    radius = 6371.0
-
-    # Calculate the distance
-    distance = radius * c
-    
-    return distance
-
->>>>>>> 8d5ac9eeaee1ad0f1716d313e291f262ef5370fb
 if __name__ == '__main__':
     queue = Queue()
     shared_gps = Array('d', [0.0, 0.0])
