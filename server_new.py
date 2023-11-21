@@ -111,7 +111,8 @@ def sender(train_table,queue,lock):
                 train_port=3000
                 train_address=(train_ip,train_port)
                 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                server_socket.sendto(data, train_address)
+                packet=pickle.dumps(data)
+                server_socket.sendto(packet, train_address)
 
 if __name__ == '__main__':
     queue = Queue()
