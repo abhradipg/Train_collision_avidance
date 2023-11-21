@@ -108,6 +108,14 @@ def process_data(lat1, lon1, lat2, lon2):
     print("distance is - "+distance)
     return distance
 
+def print_metrics(segments,distance):
+    train_id=segments[3]
+    speed=segments[2]
+    print("Train ID: ",train_id," is at location: ",segments[0][0],"\u00B0 N ",segments[0][1],"\u00B0 E")
+    print("Speed of train is: ",speed,"km/hr \n")
+    print("Distance between trains is: ",distance,"km \n")
+
+
 def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
     server_ip = '127.0.0.1'
     server_port = 3000
@@ -134,8 +142,31 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
             client_port = 2000
             server_socket.sendto(ack_message.encode(), (client_ip,client_port))
             forward_train_gps=segments[0]
-            process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
+            distance=process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
+            print_metrics(segments,distance)
 
+
+<<<<<<< HEAD
+=======
+def process_data(lat1, lon1, lat2, lon2):
+    # Convert latitude and longitude from degrees to radians
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+    # Haversine formula
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    # Radius of the Earth in kilometers (change it to 3958.8 for miles)
+    radius = 6371.0
+
+    # Calculate the distance
+    distance = radius * c
+    
+    return distance
+
+>>>>>>> 8d5ac9eeaee1ad0f1716d313e291f262ef5370fb
 if __name__ == '__main__':
     queue = Queue()
     shared_gps = Array('d', [0.0, 0.0])
