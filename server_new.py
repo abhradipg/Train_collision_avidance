@@ -12,16 +12,16 @@ import time
 #receive data from trains and send acknowldgement back and update train-track table
 def receiver(train_table,queue,lock):
     print("receiver started")
-    server_ip='127.0.0.1'
-    server_port=2000
+    receiver_ip='10.217.59.218'
+    receiver_port=2000
     sender_port=3000
    
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_socket.bind((server_ip, server_port))
+    receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    receiver_socket.bind((receiver_ip, receiver_port))
 
     while True:
         #received data is [gps,trackid,speed,trainid,ack_no]
-        data, client_address = server_socket.recvfrom(1024)
+        data, client_address = receiver_socket.recvfrom(1024)
         data = pickle.loads(data)
         print("data received by server-")
         print(data)
@@ -32,7 +32,7 @@ def receiver(train_table,queue,lock):
         ack_no = pickle.dumps(ack_no)
 
         #sending acknowledgement
-        server_socket.sendto(ack_no, client_address)
+        receiver_socket.sendto(ack_no, (ip_addr,sender_port))
         lock.aquire()
         for tid in train_table:
             if tid != track_id:

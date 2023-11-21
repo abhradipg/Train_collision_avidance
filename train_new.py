@@ -86,7 +86,7 @@ def rfid_reader(queue):
 
 
 def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
-    server_ip = '127.0.0.1'
+    server_ip = '10.217.59.218'
     server_port = 2000
     server_addr = (server_ip, server_port)
 
@@ -158,7 +158,9 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
             ack_lock.release()
         else:
             ack_message = segments[-1]
-            server_socket.sendto(ack_message.encode(), client_address)
+            client_ip, client_port = client_address
+            client_port = 2000
+            server_socket.sendto(ack_message.encode(), (client_ip,client_port))
             forward_train_gps=segments[0]
             process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
 
