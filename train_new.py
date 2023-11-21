@@ -76,10 +76,10 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
             data.append(train_id)
             data.append(ack_no)
             curr_ack=ack_no
-            ack_lock=lock.acquire()
+            ack_lock.acquire()
             ack_no=ack_no+1
             received_ack=0
-            ack_lock=lock.acquire()
+            ack_lock.release()
             send_time=time.time()
             data = pickle.dumps(data)
             client_socket.sendto(data, (server_ip, server_port))
@@ -89,6 +89,24 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
             if curr_time - send_time > rtt_approx:
                 send_time = time.time()
                 client_socket.sendto(data, (server_ip, server_port))
+
+def process_data(lat1, lon1, lat2, lon2):
+    # Convert latitude and longitude from degrees to radians
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+    # Haversine formula
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    # Radius of the Earth in kilometers (change it to 3958.8 for miles)
+    radius = 6371.0
+
+    # Calculate the distance
+    distance = radius * c
+    print("distance is - "+distance)
+    return distance
 
 def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
     server_ip = '127.0.0.1'
@@ -117,24 +135,6 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
             server_socket.sendto(ack_message.encode(), (client_ip,client_port))
             forward_train_gps=segments[0]
             process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
-
-def process_data(lat1, lon1, lat2, lon2):
-    # Convert latitude and longitude from degrees to radians
-    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-
-    # Haversine formula
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-    # Radius of the Earth in kilometers (change it to 3958.8 for miles)
-    radius = 6371.0
-
-    # Calculate the distance
-    distance = radius * c
-    print("distance is - "+distance)
-    return distance
 
 if __name__ == '__main__':
     queue = Queue()

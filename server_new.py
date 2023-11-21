@@ -33,7 +33,7 @@ def receiver(train_table,queue,lock):
 
         #sending acknowledgement
         receiver_socket.sendto(ack_no, (ip_addr,sender_port))
-        lock.aquire()
+        lock.acquire()
         for tid in train_table:
             if tid != track_id:
                 tuple_list = train_table[track_id].copy()
