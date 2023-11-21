@@ -26,7 +26,7 @@ def receiver(train_table,queue,lock):
     receiver_port=2000
     sender_port=3000
     receiver_new_data=0
-    ack_no=0
+    curr_ack_no=0
    
     #start a UDP socket connection for receiver
     receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -88,8 +88,8 @@ def receiver(train_table,queue,lock):
             #pikle the data received and put in the queue to be read by sender function
             data_new=data[0:4]
             data_new.append(ip_addr)
-            data_new.append(ack_no)
-            ack_no=ack_no+1
+            data_new.append(curr_ack_no)
+            curr_ack_no=curr_ack_no+1
             data_new=pickle.dumps(data_new)
             #Append train IP and insert in queue
             queue.put(data_new)
