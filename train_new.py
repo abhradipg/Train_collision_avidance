@@ -105,15 +105,15 @@ def process_data(lat1, lon1, lat2, lon2):
 
     # Calculate the distance
     distance = radius * c
-    print("distance is - "+distance)
+    print("distance is - "+str(distance))
     return distance
 
 def print_metrics(segments,distance):
     train_id=segments[3]
     speed=segments[2]
-    print("Train ID: ",train_id," is at location: ",segments[0][0],"\u00B0 N ",segments[0][1],"\u00B0 E")
-    print("Speed of train is: ",speed,"km/hr \n")
-    print("Distance between trains is: ",distance,"km \n")
+    print("Train ID: ",str(train_id)," is at location: ",str(segments[0][0]),"\u00B0 N ",str(segments[0][1]),"\u00B0 E")
+    print("Speed of train is: ",str(speed),"km/hr \n")
+    print("Distance between trains is: ",str(distance),"km \n")
 
 
 def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
