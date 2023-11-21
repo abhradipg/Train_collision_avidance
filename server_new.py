@@ -65,18 +65,20 @@ def receiver(train_table,queue,lock):
                             print(tuple)
                             train_table[tid].remove(tuple)
             lock.release()
-
+            
             #Update the train table
             tuple = [train_id,ip_addr,port_no]
             lock.acquire()
             if track_id in train_table.keys():
                 # Key already exists, append value to the existing list
                 if tuple not in train_table[track_id]:
+                    print(f"Before table: {train_table}")
                     print("append")
-                    train_table[track_id].append(tuple)
+                    train_table[track_id]+=[tuple]
             else:
                 # Key does not exist, create a new entry with a list containing the value
-                train_table[track_id] = [tuple]
+                train_table[track_id] = list()
+                train_table[track_id]+=[tuple]
             lock.release()
 
             print(f"Updated table: {train_table}")
