@@ -133,7 +133,7 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
             print("got ack")
             print(ack_no)
             print(curr_ack)
-            ack_lock.acuire()
+            ack_lock.acquire()
             if ack_no==curr_ack:
                 received_ack=1
             ack_lock.release()

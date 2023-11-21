@@ -25,6 +25,7 @@ def receiver(train_table,queue,lock):
     receiver_ip='10.192.241.200'
     receiver_port=2000
     sender_port=3000
+    receiver_new_data=0
    
     #start a UDP socket connection for receiver
     receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
