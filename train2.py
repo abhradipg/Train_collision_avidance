@@ -158,7 +158,7 @@ def print_metrics(segments,distance,speed_lock):
 
 def receiver(shared_gps,curr_ack,slowdown,received_ack,ack_lock,lock,speed_lock):
     #server_ip = '10.192.241.2'
-    server_ip = '10.192.240.106'
+    server_ip = '10.192.240.184'
     server_port = 3000
     forward_train_gps = 0
     train_id=12340
@@ -200,40 +200,40 @@ def receiver(shared_gps,curr_ack,slowdown,received_ack,ack_lock,lock,speed_lock)
 
             print_metrics(segments,distance,speed_lock)
 
-    def tcp_server(slowdown,speed_lock):
-        server_ip='10.192.240.106'
-        server_port=2500
-        server_address = (server_ip,server_port)
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+def tcp_server(slowdown,speed_lock):
+    server_ip='10.192.240.184'
+    server_port=2500
+    server_address = (server_ip,server_port)
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        server_socket.bind(server_address)
-        server_socket.listen(10)
+    server_socket.bind(server_address)
+    server_socket.listen(10)
 
-        while True:
-            # Wait for a connection
-            print('Waiting for a connection...')
-            client_socket, client_address = server_socket.accept()
-            print('Accepted connection from {}:{}'.format(*client_address))
+    while True:
+        # Wait for a connection
+        print('Waiting for a connection...')
+        client_socket, client_address = server_socket.accept()
+        print('Accepted connection from {}:{}'.format(*client_address))
 
-            # Receive and print the data
-            data = client_socket.recv(1024)
-            if data:
-                message = data.decode('utf-8')
-                print(message)
-                if(message=="slow"):
-                    speed_lock.acquire()
-                    slowdown.value = 1
-                    speed_lock.release()
-                    print("Slowing down !!!")
+        # Receive and print the data
+        data = client_socket.recv(1024)
+        if data:
+            message = data.decode('utf-8')
+            print(message)
+            if(message=="slow"):
+                speed_lock.acquire()
+                slowdown.value = 1
+                speed_lock.release()
+                print("Slowing down !!!")
 
-                elif(message=="stop"):
-                    speed_lock.acquire()
-                    slowdown.value = 2
-                    speed_lock.release()
-                    print("Braking !!! Dangerously Close")
+            elif(message=="stop"):
+                speed_lock.acquire()
+                slowdown.value = 2
+                speed_lock.release()
+                print("Braking !!! Dangerously Close")
 
-            # Close the connection
-            client_socket.close()
+        # Close the connection
+        client_socket.close()
 
 if __name__ == '__main__':
     queue = Queue()
