@@ -61,7 +61,7 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
     ack_no=0
 
     while True:
-        sleep(0.2)
+        sleep(0.1)
         try:
             queue_empty=0
             data = queue.get(block=False)
