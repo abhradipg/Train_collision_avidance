@@ -79,6 +79,11 @@ def generate_dict():
     gps = [12.9716, 77.6096] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
+
+    key = b'61de'
+    gps = [12.9716, 77.6104] 
+    track_id = 7            
+    my_dict[key] = [gps, track_id]
     
 
 
@@ -163,5 +168,9 @@ def generate_dict():
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
+    key = b'61eg'
+    gps = [12.9716, 77.6114] 
+    track_id = 7            
+    my_dict[key] = [gps, track_id]
 
     return my_dict
