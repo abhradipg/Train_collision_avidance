@@ -132,6 +132,7 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
     print("binded")
     while True:
         #sleep(0.2)
+        print("in while")
         data, client_address = server_socket.recvfrom(1024)
         print("received data")
         segments = pickle.loads(data)
