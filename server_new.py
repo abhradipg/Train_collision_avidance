@@ -37,7 +37,7 @@ def receiver(train_table,queue,lock):
         #sending acknowledgement
         receiver_socket.sendto(ack_no, (ip_addr,sender_port))
         lock.acquire()
-        for tid in train_table:
+        for tid in train_table.keys():
             if tid != track_id:
                 tuple_list = train_table[track_id].copy()
                 for tuple in tuple_list:
@@ -48,7 +48,7 @@ def receiver(train_table,queue,lock):
         tuple = [train_id,ip_addr,port_no]
 
         lock.aquire()
-        if track_id in train_table:
+        if track_id in train_table.keys():
             # Key already exists, append value to the existing list
             if tuple not in train_table[track_id]:
                 train_table[track_id].append(tuple)
