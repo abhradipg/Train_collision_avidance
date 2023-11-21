@@ -60,7 +60,7 @@ def receiver(train_table,queue,lock):
 
         print(f"Updated table: {train_table}")
 
-        queue.put(data[0,4])
+        queue.put(data[0:4])
 
 #send data to trains in current tracks and wait for acks back
 def sender(train_table,queue,lock):
