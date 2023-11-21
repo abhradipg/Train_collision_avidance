@@ -21,7 +21,7 @@ def rfid_reader(queue):
     #while True:
     with open(file_path, 'r') as file:
         for line in file:
-            sleep(1)
+            sleep(5)
             if "'EPCData':" in line:
                 # Convert the string representation of the dictionary to an actual dictionary
                 data_dict = ast.literal_eval(line.strip())
@@ -117,7 +117,7 @@ def print_metrics(segments,distance):
 
 
 def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
-    server_ip = '10.192.241.2'
+    server_ip = '10.192.240.106'
     server_port = 3000
     forward_train_gps = 0
 
@@ -132,6 +132,7 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
             ack_no=segments[0]
             print("got ack")
             print(ack_no)
+            print(curr_ack)
             ack_lock.acuire()
             if ack_no==curr_ack:
                 received_ack=1

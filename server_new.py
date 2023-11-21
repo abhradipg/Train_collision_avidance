@@ -19,9 +19,6 @@ receiver
 -need to take lock for train_table as it is used by sender function
 '''
 def receiver(train_table,queue,lock):
-    lock.acquire()
-    train_table[0]=[0,0,0]
-    lock.release()
 
     #put our own IP and port on receiver IP and port
     print("receiver started")
@@ -57,11 +54,12 @@ def receiver(train_table,queue,lock):
         lock.acquire()
         for tid in train_table.keys():
             if tid != track_id:
-                if track_id in train_table.keys():
-                    tuple_list = train_table[track_id].copy()
-                    for tuple in tuple_list:
-                        if tuple[0] == train_id:
-                            train_table[tid].remove(tuple)
+                tuple_list = train_table[tid].copy()
+                for tuple in tuple_list:
+                    if tuple[0] == train_id:
+                        print(tid)
+                        print(tuple)
+                        train_table[tid].remove(tuple)
         lock.release()
 
         #Update the train table
