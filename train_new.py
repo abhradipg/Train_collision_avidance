@@ -38,7 +38,7 @@ def rfid_reader(queue):
                     print(f"Data {data} not found in my_dict")
 
 
-def sender(queue,shared_gps,lock):
+def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
     server_ip = '127.0.0.1'
     server_port = 2000
     server_addr = (server_ip, server_port)
@@ -49,12 +49,15 @@ def sender(queue,shared_gps,lock):
     queue_empty=0
     data=[]
     
+    ack_lock.acquire()
     received_ack=1
-    ack_no=0
     curr_ack=0
-    rtt_approx=100
+    ack_lock.release()
+    rtt_approx=1
     speed=100
     train_id=12345
+    curr_time=0
+    send_time=0
 
     while True:
         try:
@@ -72,26 +75,21 @@ def sender(queue,shared_gps,lock):
             data.append(train_id)
             data.append(ack_no)
             curr_ack=ack_no
+            ack_lock=lock.acquire()
             ack_no=ack_no+1
             received_ack=0
-            #curr_time=time.time()
+            ack_lock=lock.acquire()
+            send_time=time.time()
             data = pickle.dumps(data)
             client_socket.sendto(data, (server_ip, server_port))
         
         if received_ack==0:
-            client_socket.settimeout(rtt_approx)
-            try:
-                ack_data, server_address = client_socket.recvfrom(1024)
-                ack_data=pickle.loads(ack_data)
-                ack_data=ack_data[0]
-                print(ack_data)
-                if server_address==server_addr and ack_data==curr_ack:
-                    received_ack=1
+            curr_time=time.time()
+            if curr_time - send_time > rtt_approx:
+                send_time = time.time()
+                client_socket.sendto(data, (server_ip, server_port))
 
-            except socket.timeout:
-                received_ack=0
-
-def receiver(shared_gps,lock):
+def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
     server_ip = '127.0.0.1'
     server_port = 3000
     forward_train_gps = 0
@@ -103,10 +101,19 @@ def receiver(shared_gps,lock):
     while True:
         data, client_address = server_socket.recvfrom(1024)
         segments = pickle.loads(data)
-        ack_message = segments[-1]
-        server_socket.sendto(ack_message.encode(), client_address)
-        forward_train_gps=segments[0]
-        process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
+        if len(segments)==1:
+            ack_no=segments[0]
+            print("got ack")
+            print(ack_no)
+            ack_lock.acuire()
+            if ack_no==curr_ack:
+                received_ack=1
+            ack_lock.release()
+        else:
+            ack_message = segments[-1]
+            server_socket.sendto(ack_message.encode(), client_address)
+            forward_train_gps=segments[0]
+            process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
 
 def process_data(lat1, lon1, lat2, lon2):
     # Convert latitude and longitude from degrees to radians
@@ -129,12 +136,15 @@ def process_data(lat1, lon1, lat2, lon2):
 if __name__ == '__main__':
     queue = Queue()
     shared_gps = Array('d', [0.0, 0.0])
+    curr_ack = Value('i') 
+    received_ack = Value('i') 
     lock=Lock()
+    ack_lock=Lock()
     reader_process = Process(target=rfid_reader, args=(queue,))
     reader_process.start()
-    sender_process = Process(target=sender, args=(queue,shared_gps,lock))
+    sender_process = Process(target=sender, args=(queue,shared_gps,curr_ack,received_ack,ack_lock,lock))
     sender_process.start()
-    reciver_process = Process(target=receiver, args=(shared_gps,lock))
+    reciver_process = Process(target=receiver, args=(shared_gps,curr_ack,received_ack,ack_lock,lock))
     reciver_process.start()
     reader_process.join()
     sender_process.join()

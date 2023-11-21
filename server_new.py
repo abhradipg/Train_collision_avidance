@@ -14,6 +14,7 @@ def receiver(train_table,queue,lock):
     print("receiver started")
     server_ip='127.0.0.1'
     server_port=2000
+    sender_port=3000
    
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server_socket.bind((server_ip, server_port))
