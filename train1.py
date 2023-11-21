@@ -137,6 +137,7 @@ def print_metrics(segments,distance,speed_lock):
         slowdown.value = 2
         speed_lock.release()
         print("Braking !!! Dangerously Close")
+        print(server_address)
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(server_address)
         message="stop"
@@ -148,6 +149,7 @@ def print_metrics(segments,distance,speed_lock):
         slowdown.value = 1
         speed_lock.release()
         print("Slowing down !!!")
+        print(server_address)
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(server_address)
         message="slow"
@@ -246,6 +248,7 @@ if __name__ == '__main__':
     ack_lock=Lock()
     speed_lock=Lock()
     tcp_process = Process(target=tcp_server, args=(slowdown,speed_lock))
+    tcp_process.start()
     reader_process = Process(target=rfid_reader, args=(queue,slowdown,speed_lock))
     reader_process.start()
     sender_process = Process(target=sender, args=(queue,shared_gps,curr_ack,received_ack,ack_lock,lock))
@@ -255,6 +258,7 @@ if __name__ == '__main__':
     reader_process.join()
     sender_process.join()
     reciver_process.join()
+    tcp_process.join()
 
 '''
 class RTOCalculator:
