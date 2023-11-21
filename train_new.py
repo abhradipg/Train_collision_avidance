@@ -58,6 +58,7 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
     train_id=12345
     curr_time=0
     send_time=0
+    ack_no=0
 
     while True:
         try:
