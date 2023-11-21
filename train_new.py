@@ -120,7 +120,7 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
     server_ip = '10.192.240.106'
     server_port = 3000
     forward_train_gps = 0
-
+    train_id=12345
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     server_socket.bind((server_ip, server_port))
@@ -139,10 +139,11 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
             ack_lock.release()
         else:
             ack_message = [segments[-1]]
+            ack_message = ack_message.append(train_id)
             ack_message = pickle.dumps(ack_message)
             client_ip, client_port = client_address
             client_port = 2000
-            server_socket.sendto(ack_message.encode(), (client_ip,client_port))
+            server_socket.sendto(ack_message, (client_ip,client_port))
             forward_train_gps=segments[0]
             distance=process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
             print_metrics(segments,distance)

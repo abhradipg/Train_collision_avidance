@@ -42,45 +42,46 @@ def receiver(train_table,queue,lock):
         data = pickle.loads(data)
         print("data received by server-")
         print(data)
-        track_id = data[1] 
-        ip_addr, port_no = client_address
-        train_id = data[3]
-        ack_no = [data[-1]]
+        if len(data) != 2:
+            track_id = data[1] 
+            ip_addr, port_no = client_address
+            train_id = data[3]
+            ack_no = [data[-1]]
 
-        #pikl the ACK and send 
-        ack_no = pickle.dumps(ack_no)
-        receiver_socket.sendto(ack_no, (ip_addr,sender_port))
+            #pikle the ACK and send 
+            ack_no = pickle.dumps(ack_no)
+            receiver_socket.sendto(ack_no, (ip_addr,sender_port))
 
-        #remove the entry if train was present in another track in the table
-        lock.acquire()
-        for tid in train_table.keys():
-            if tid != track_id:
-                tuple_list = train_table[tid].copy()
-                for tuple in tuple_list:
-                    if tuple[0] == train_id:
-                        print(tid)
-                        print(tuple)
-                        train_table[tid].remove(tuple)
-        lock.release()
+            #remove the entry if train was present in another track in the table
+            lock.acquire()
+            for tid in train_table.keys():
+                if tid != track_id:
+                    tuple_list = train_table[tid].copy()
+                    for tuple in tuple_list:
+                        if tuple[0] == train_id:
+                            print(tid)
+                            print(tuple)
+                            train_table[tid].remove(tuple)
+            lock.release()
 
-        #Update the train table
-        tuple = [train_id,ip_addr,port_no]
-        lock.acquire()
-        if track_id in train_table.keys():
-            # Key already exists, append value to the existing list
-            if tuple not in train_table[track_id]:
-                train_table[track_id].append(tuple)
-        else:
-            # Key does not exist, create a new entry with a list containing the value
-            train_table[track_id] = [tuple]
-        lock.release()
+            #Update the train table
+            tuple = [train_id,ip_addr,port_no]
+            lock.acquire()
+            if track_id in train_table.keys():
+                # Key already exists, append value to the existing list
+                if tuple not in train_table[track_id]:
+                    train_table[track_id].append(tuple)
+            else:
+                # Key does not exist, create a new entry with a list containing the value
+                train_table[track_id] = [tuple]
+            lock.release()
 
-        print(f"Updated table: {train_table}")
-        print(data)
+            print(f"Updated table: {train_table}")
+            print(data)
 
-        #pikl the data received and put in the queue to be read by sender function
-        data_new=pickle.dumps(data[0:4])
-        queue.put(data_new)
+            #pikl the data received and put in the queue to be read by sender function
+            data_new=pickle.dumps(data[0:4])
+            queue.put(data_new)
 
 '''
 sender
