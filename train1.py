@@ -189,7 +189,7 @@ if __name__ == '__main__':
     received_ack = Value('i') 
     lock=Lock()
     ack_lock=Lock()
-    speed_lock=lock()
+    speed_lock=Lock()
     reader_process = Process(target=rfid_reader, args=(queue,))
     reader_process.start()
     sender_process = Process(target=sender, args=(queue,shared_gps,curr_ack,received_ack,ack_lock,lock))
