@@ -117,7 +117,7 @@ def print_metrics(segments,distance):
 
 
 def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
-    server_ip = '10.192.240.106'
+    server_ip = '10.192.241.2'
     server_port = 3000
     forward_train_gps = 0
 
