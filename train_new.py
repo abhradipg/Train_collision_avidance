@@ -61,7 +61,7 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
     ack_no=0
 
     while True:
-        sleep(0.1)
+        sleep(0.2)
         try:
             queue_empty=0
             data = queue.get(block=False)
@@ -131,7 +131,7 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
     server_socket.bind((server_ip, server_port))
 
     while True:
-        sleep(0.1)
+        sleep(0.2)
         data, client_address = server_socket.recvfrom(1024)
         print("received data")
         segments = pickle.loads(data)
