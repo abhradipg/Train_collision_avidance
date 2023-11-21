@@ -11,6 +11,9 @@ import time
 
 #receive data from trains and send acknowldgement back and update train-track table
 def receiver(train_table,queue,lock):
+    lock.acquire()
+    train_table[0]=[0,0,0]
+    lock.release()
     print("receiver started")
     receiver_ip='10.217.59.218'
     receiver_port=2000
