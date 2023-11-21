@@ -72,6 +72,7 @@ def receiver(train_table,queue,lock):
             if track_id in train_table.keys():
                 # Key already exists, append value to the existing list
                 if tuple not in train_table[track_id]:
+                    print("append")
                     train_table[track_id].append(tuple)
             else:
                 # Key does not exist, create a new entry with a list containing the value

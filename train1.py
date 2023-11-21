@@ -102,6 +102,8 @@ def process_data(lat1, lon1, lat2, lon2):
     # Haversine formula
     dlat = lat2 - lat1
     dlon = lon2 - lon1
+    print(dlat)
+    print(dlon)
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
@@ -157,7 +159,9 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
             client_port = 2000
             server_socket.sendto(ack_message, (client_ip,client_port))
             forward_train_gps=segments[0]
+            lock.acquire()
             distance=process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
+            lock.release()
             print_metrics(segments,distance)
 
 if __name__ == '__main__':
