@@ -132,7 +132,7 @@ def print_metrics(segments,distance,speed_lock):
     print("Train ID: ",str(train_id)," is at location: ",str(segments[0][0]),"\u00B0 N ",str(segments[0][1]),"\u00B0 E")
     print("Speed of train is: ",str(speed),"km/hr \n")
     print("Distance between trains is: ",str(distance),"km \n")
-    if distance < 0.300:
+    if distance < 0.35:
         speed_lock.acquire()
         slowdown.value = 2
         speed_lock.release()
@@ -146,15 +146,17 @@ def print_metrics(segments,distance,speed_lock):
 
     elif distance < 1:
         speed_lock.acquire()
-        slowdown.value = 1
+        if slowdown.value != 2: 
+            slowdown.value = 1
         speed_lock.release()
-        print("Slowing down !!!")
-        print(server_address)
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect(server_address)
-        message="slow"
-        client_socket.sendall(message.encode('utf-8'))
-        client_socket.close()
+        if slowdown.value != 2:
+            print("Slowing down !!!")
+            print(server_address)
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect(server_address)
+            message="slow"
+            client_socket.sendall(message.encode('utf-8'))
+            client_socket.close()
     
 
 
@@ -224,9 +226,11 @@ def tcp_server(slowdown,speed_lock):
             #print(message)
             if(message=="slow"):
                 speed_lock.acquire()
-                slowdown.value = 1
+                if slowdown.value != 2: 
+                    slowdown.value = 1
                 speed_lock.release()
-                print("Train Slowing down !!!")
+                if slowdown.value != 2:
+                    print("Train Slowing down !!!")
 
             elif(message=="stop"):
                 speed_lock.acquire()
