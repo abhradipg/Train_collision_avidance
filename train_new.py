@@ -61,6 +61,7 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
     ack_no=0
 
     while True:
+        sleep(0.2)
         try:
             queue_empty=0
             data = queue.get(block=False)
@@ -121,7 +122,7 @@ def print_metrics(segments,distance):
 
 
 def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
-    server_ip = '10.192.240.106'
+    server_ip = '10.192.241.2'
     server_port = 3000
     forward_train_gps = 0
     train_id=12345
@@ -129,6 +130,7 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
     server_socket.bind((server_ip, server_port))
 
     while True:
+        sleep(0.2)
         data, client_address = server_socket.recvfrom(1024)
         print("received data")
         segments = pickle.loads(data)
