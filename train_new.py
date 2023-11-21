@@ -24,9 +24,9 @@ def rfid_reader(queue,slowdown,speed_lock):
             speed_lock.acquire()
             if(slowdown.value == 2):
                 sleep(3000)
-            elif(slowdown.value)
+            elif slowdown.value == 1:
                 sleep(15)
-            else
+            else:
                 sleep(5)
             speed_lock.release()
 
@@ -128,12 +128,12 @@ def print_metrics(segments,distance):
     print("Train ID: ",str(train_id)," is at location: ",str(segments[0][0]),"\u00B0 N ",str(segments[0][1]),"\u00B0 E")
     print("Speed of train is: ",str(speed),"km/hr \n")
     print("Distance between trains is: ",str(distance),"km \n")
-    if (distance < 0.300)
+    if distance < 0.300:
         speed_lock.acquire()
         slowdown.value = 2
         speed_lock.release()
         print("Braking !!! Dangerously Close")
-    else if (distance < 1)
+    elif distance < 1:
         speed_lock.acquire()
         slowdown.value = 1
         speed_lock.release()
