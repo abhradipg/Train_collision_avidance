@@ -138,7 +138,8 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
                 received_ack=1
             ack_lock.release()
         else:
-            ack_message = segments[-1]
+            ack_message = [segments[-1]]
+            ack_message = pickle.dumps(ack_message)
             client_ip, client_port = client_address
             client_port = 2000
             server_socket.sendto(ack_message.encode(), (client_ip,client_port))
