@@ -71,12 +71,12 @@ def generate_dict():
     my_dict[key] = [gps, track_id]
 
     key = b'61de'
-    gps = [12.9726, 77.6086] 
+    gps = [12.9716, 77.6086] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61df'
-    gps = [12.9726, 77.6086] 
+    gps = [12.9716, 77.6096] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
     
@@ -84,82 +84,82 @@ def generate_dict():
 
 
     key = b'61e0'
-    gps = [12.9616, 77.5946] 
+    gps = [12.9716, 77.6266] 
     track_id = 7
     my_dict[key] = [gps, track_id]
 
     key = b'61e1'
-    gps = [12.9616, 77.5936] 
+    gps = [12.9716, 77.6256] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61e2'
-    gps = [12.9616, 77.5926] 
+    gps = [12.9716, 77.6246] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61e3'
-    gps = [12.9616, 77.5916] 
+    gps = [12.9716, 77.6236] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61e4'
-    gps = [12.9616, 77.5906] 
+    gps = [12.9716, 77.6226] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61e5'
-    gps = [12.9616, 77.5896] 
+    gps = [12.9716, 77.6216] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61e6'
-    gps = [12.9616, 77.5886] 
+    gps = [12.9716, 77.6206] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
     
     key = b'61e7'
-    gps = [12.9616, 77.5876] 
+    gps = [12.9716, 77.6196] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61e8'
-    gps = [12.9616, 77.5866] 
+    gps = [12.9716, 77.6186] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61e9'
-    gps = [12.9616, 77.5856] 
+    gps = [12.9716, 77.6176] 
     track_id = 7
     my_dict[key] = [gps, track_id]
 
     key = b'61ea'
-    gps = [12.9616, 77.5846] 
+    gps = [12.9716, 77.6166] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61eb'
-    gps = [12.9616, 77.5836] 
+    gps = [12.9716, 77.6156] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61ec'
-    gps = [12.9616, 77.5826] 
+    gps = [12.9716, 77.6146] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61ed'
-    gps = [12.9616, 77.5816] 
+    gps = [12.9716, 77.6136] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61ee'
-    gps = [12.9616, 77.5806] 
+    gps = [12.9716, 77.6126] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
     key = b'61ef'
-    gps = [12.9606, 77.5806] 
+    gps = [12.9716, 77.6116] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
 
