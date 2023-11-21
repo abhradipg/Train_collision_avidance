@@ -140,6 +140,8 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
         else:
             ack_message = [segments[-1]]
             ack_message = ack_message.append(train_id)
+            print("train ack")
+            print(ack_message)
             ack_message = pickle.dumps(ack_message)
             client_ip, client_port = client_address
             client_port = 2000
