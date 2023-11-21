@@ -76,8 +76,8 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
             data.append(speed)
             data.append(train_id)
             data.append(ack_no)
-            curr_ack=ack_no
             ack_lock.acquire()
+            curr_ack=ack_no
             ack_no=ack_no+1
             received_ack=0
             ack_lock.release()
@@ -141,8 +141,8 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
             ack_no=segments[0]
             print("got ack")
             print(ack_no)
-            print(curr_ack)
             ack_lock.acquire()
+            print(curr_ack)
             if ack_no==curr_ack:
                 received_ack=1
             ack_lock.release()
