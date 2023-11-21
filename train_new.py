@@ -81,6 +81,8 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
             received_ack=0
             ack_lock.release()
             send_time=time.time()
+            print("sending data")
+            print(data)
             data = pickle.dumps(data)
             client_socket.sendto(data, (server_ip, server_port))
         
@@ -88,6 +90,8 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
             curr_time=time.time()
             if curr_time - send_time > rtt_approx:
                 send_time = time.time()
+                print("resending data")
+                print(data)
                 client_socket.sendto(data, (server_ip, server_port))
 
 def process_data(lat1, lon1, lat2, lon2):
