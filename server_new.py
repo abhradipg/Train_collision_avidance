@@ -81,7 +81,7 @@ def receiver(train_table,queue,lock):
             print(f"Updated table: {train_table}")
             print(data)
 
-            #pikl the data received and put in the queue to be read by sender function
+            #pikle the data received and put in the queue to be read by sender function
             data_new=pickle.dumps(data[0:4])
             queue.put(data_new)
 
@@ -117,15 +117,16 @@ def sender(train_table,queue,lock):
             #Forward the data to all trains in the tracks
             #tuple = [  train_id,   ip_addr,    port_no]
             for train in train_list:
-                train_ip=train[1]
-                print(train_ip)
-                train_port=3000
-                train_address=(train_ip,train_port)
-                server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                print("sending gps")
-                print(data)
-                packet=pickle.dumps(data)
-                server_socket.sendto(packet, train_address)
+                if train[0]!=data[3]:
+                    train_ip=train[1]
+                    print(train_ip)
+                    train_port=3000
+                    train_address=(train_ip,train_port)
+                    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    print("sending gps")
+                    print(data)
+                    packet=pickle.dumps(data)
+                    server_socket.sendto(packet, train_address)
 
 if __name__ == '__main__':
     queue = Queue()
