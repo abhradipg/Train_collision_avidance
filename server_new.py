@@ -15,7 +15,7 @@ def receiver(train_table,queue,lock):
     train_table[0]=[0,0,0]
     lock.release()
     print("receiver started")
-    receiver_ip='10.217.59.218'
+    receiver_ip='10.192.241.200'
     receiver_port=2000
     sender_port=3000
    
