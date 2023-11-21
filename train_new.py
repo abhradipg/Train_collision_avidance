@@ -10,59 +10,12 @@ import socket
 import time
 import ast
 import pickle
-
+import generate_dict
 
 my_dict = {}
-def generate_dict():
-
-    key = b'61d0'
-    gps = [38.897701, -77.036552] 
-    track_id = 7
-    my_dict[key] = [gps, track_id]
-
-    key = b'61d1'
-    gps = [23.66, 4.53] 
-    track_id = 7            
-    my_dict[key] = [gps, track_id]
-
-    key = b'61d2'
-    gps = [56.44, -74.02] 
-    track_id = 7            
-    my_dict[key] = [gps, track_id]
-
-    key = b'61d3'
-    gps = [73.80, 153.56] 
-    track_id = 7            
-    my_dict[key] = [gps, track_id]
-
-    key = b'61d4'
-    gps = [49.12, -33.71] 
-    track_id = 7            
-    my_dict[key] = [gps, track_id]
-
-    key = b'61d5'
-    gps = [-47.97, 144.98] 
-    track_id = 7            
-    my_dict[key] = [gps, track_id]
-
-    key = b'61d6'
-    gps = [-78.87,-32.05] 
-    track_id = 7            
-    my_dict[key] = [gps, track_id]
-    
-    key = b'61d7'
-    gps = [-78.87,-34.05] 
-    track_id = 7            
-    my_dict[key] = [gps, track_id]
-
-    key = b'61d8'
-    gps = [-78.87,-31.05] 
-    track_id = 7            
-    my_dict[key] = [gps, track_id]
-    
 
 def rfid_reader(queue):
-    generate_dict()
+    my_dict=generate_dict.generate_dict()
     old_data=''
     file_path = 'dummy_data1.txt'
     #while True:
