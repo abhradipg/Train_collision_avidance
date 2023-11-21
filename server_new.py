@@ -33,7 +33,6 @@ def receiver(train_table,queue,lock):
 
     #start receiving data
     while True:
-        sleep(0.1)
         '''
         #received data is of the format 
         [   gps,    trackid,    speed,  trainid,    ack_no  ]
@@ -51,6 +50,8 @@ def receiver(train_table,queue,lock):
 
             #pikle the ACK and send 
             ack_no = pickle.dumps(ack_no)
+            print("sending ack")
+            print((ip_addr,sender_port))
             receiver_socket.sendto(ack_no, (ip_addr,sender_port))
 
             #remove the entry if train was present in another track in the table
@@ -98,7 +99,6 @@ def sender(train_table,queue,lock):
     
     #read from queue
     while True:
-        sleep(0.1)
         try:
             queue_empty=0
             data=queue.get(block=False)
@@ -122,6 +122,8 @@ def sender(train_table,queue,lock):
                 train_port=3000
                 train_address=(train_ip,train_port)
                 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                print("sending gps")
+                print(packet)
                 packet=pickle.dumps(data)
                 server_socket.sendto(packet, train_address)
 
