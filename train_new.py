@@ -75,7 +75,8 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
             data = queue.get(block=False)
             print("received new data")
             lock.acquire()
-            shared_gps=data[0]
+            shared_gps[0]=data[0][0]
+            shared_gps[1]=data[0][1]
             lock.release()
         except Empty:
             queue_empty = 1

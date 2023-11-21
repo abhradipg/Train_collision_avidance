@@ -14,14 +14,22 @@ import generate_dict
 
 my_dict = {}
 
-def rfid_reader(queue):
+def rfid_reader(queue,slowdown,speed_lock):
     my_dict=generate_dict.generate_dict()
     old_data=''
     file_path = 'dummy_data1.txt'
     #while True:
     with open(file_path, 'r') as file:
         for line in file:
-            sleep(5)
+            speed_lock.acquire()
+            if(slowdown.value == 2):
+                sleep(3000)
+            elif(slowdown.value)
+                sleep(15)
+            else
+                sleep(5)
+            speed_lock.release()
+
             if "'EPCData':" in line:
                 # Convert the string representation of the dictionary to an actual dictionary
                 data_dict = ast.literal_eval(line.strip())
@@ -103,8 +111,6 @@ def process_data(lat1, lon1, lat2, lon2):
     # Haversine formula
     dlat = lat2 - lat1
     dlon = lon2 - lon1
-    print(dlat)
-    print(dlon)
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
@@ -122,9 +128,20 @@ def print_metrics(segments,distance):
     print("Train ID: ",str(train_id)," is at location: ",str(segments[0][0]),"\u00B0 N ",str(segments[0][1]),"\u00B0 E")
     print("Speed of train is: ",str(speed),"km/hr \n")
     print("Distance between trains is: ",str(distance),"km \n")
+    if (distance < 0.300)
+        speed_lock.acquire()
+        slowdown.value = 2
+        speed_lock.release()
+        print("Braking !!! Dangerously Close")
+    else if (distance < 1)
+        speed_lock.acquire()
+        slowdown.value = 1
+        speed_lock.release()
+        print("Slowing down !!!")
+    
 
 
-def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
+def receiver(shared_gps,curr_ack,slowdown,received_ack,ack_lock,lock,speed_lock):
     server_ip = '10.192.241.2'
     #server_ip = '10.192.240.106'
     server_port = 3000
@@ -160,24 +177,56 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
             client_port = 2000
             server_socket.sendto(ack_message, (client_ip,client_port))
             forward_train_gps=segments[0]
-            lock.acquire()
             distance=process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
-            lock.release()
             print_metrics(segments,distance)
 
 if __name__ == '__main__':
     queue = Queue()
     shared_gps = Array('d', [0.0, 0.0])
     curr_ack = Value('i') 
+    slowdown = Value('i')
+    slowdown.value = 0
     received_ack = Value('i') 
     lock=Lock()
     ack_lock=Lock()
+    speed_lock=lock()
     reader_process = Process(target=rfid_reader, args=(queue,))
     reader_process.start()
     sender_process = Process(target=sender, args=(queue,shared_gps,curr_ack,received_ack,ack_lock,lock))
     sender_process.start()
-    reciver_process = Process(target=receiver, args=(shared_gps,curr_ack,received_ack,ack_lock,lock))
+    reciver_process = Process(target=receiver, args=(shared_gps,curr_ack,slowdown,received_ack,ack_lock,lock,speed_lock))
     reciver_process.start()
     reader_process.join()
     sender_process.join()
     reciver_process.join()
+
+'''
+class RTOCalculator:
+    def __init__(self, initial_rtt):
+        self.ertt = initial_rtt
+        self.drtt = 0
+
+    def update_rtt(self, measured_rtt):
+        # Update ERTT and DRTT based on the measured RTT
+        alpha = 0.125  # Weighting factor for ERTT
+        beta = 0.25   # Weighting factor for DRTT
+
+        self.ertt = (1 - alpha) * self.ertt + alpha * measured_rtt
+        self.drtt = (1 - beta) * self.drtt + beta * abs(measured_rtt - self.ertt)
+
+    def calculate_rto(self):
+        # Calculate RTO using the ERTT and DRTT formula
+        return self.ertt + 4 * self.drtt
+
+# Example usage
+initial_rtt = 0.1  # Initial Round-Trip Time (seconds)
+rto_calculator = RTOCalculator(initial_rtt)
+
+# Simulate updating RTT measurements
+measured_rtt_values = [0.12, 0.15, 0.11, 0.13]
+for measured_rtt in measured_rtt_values:
+    rto_calculator.update_rtt(measured_rtt)
+    calculated_rto = rto_calculator.calculate_rto()
+    print(f"Measured RTT: {measured_rtt}, Calculated RTO: {calculated_rto}")
+
+'''
