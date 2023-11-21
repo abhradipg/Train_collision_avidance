@@ -59,8 +59,9 @@ def receiver(train_table,queue,lock):
         lock.release()
 
         print(f"Updated table: {train_table}")
-
-        queue.put(data[0:4])
+        print(data)
+        data_new=pickle.dumps(data[0:4])
+        queue.put(data_new)
 
 #send data to trains in current tracks and wait for acks back
 def sender(train_table,queue,lock):
@@ -71,14 +72,15 @@ def sender(train_table,queue,lock):
     while True:
         try:
             queue_empty=0
-            data=queue.get()
-            data = pickle.dumps(data)
+            data=queue.get(block=False)
+            data = pickle.loads(data)
 
         except:
             queue_empty=1
 
         if queue_empty==0:
             trackid=data[1]
+            print(data)
             lock.acquire()
             train_list=train_table[trackid]
             lock.release()
