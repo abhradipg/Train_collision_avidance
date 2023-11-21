@@ -50,8 +50,8 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
     data=[]
     
     ack_lock.acquire()
-    received_ack=1
-    curr_ack=0
+    received_ack.value=1
+    curr_ack.value=0
     ack_lock.release()
     rtt_approx=5
     speed=100
@@ -77,9 +77,9 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
             data.append(train_id)
             data.append(ack_no)
             ack_lock.acquire()
-            curr_ack=ack_no
+            curr_ack.value=ack_no
             ack_no=ack_no+1
-            received_ack=0
+            received_ack.value=0
             ack_lock.release()
             send_time=time.time()
             print("sending data")
@@ -87,7 +87,7 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
             data = pickle.dumps(data)
             client_socket.sendto(data, (server_ip, server_port))
         
-        if received_ack==0:
+        if received_ack.value==0:
             curr_time=time.time()
             if curr_time - send_time > rtt_approx:
                 send_time = time.time()
@@ -143,8 +143,8 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
             print(ack_no)
             ack_lock.acquire()
             print(curr_ack)
-            if ack_no==curr_ack:
-                received_ack=1
+            if ack_no==curr_ack.value:
+                received_ack.value=1
             ack_lock.release()
         else:
             ack_message = [segments[-1]]
