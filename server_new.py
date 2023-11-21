@@ -33,6 +33,7 @@ def receiver(train_table,queue,lock):
 
     #start receiving data
     while True:
+        sleep(0.1)
         '''
         #received data is of the format 
         [   gps,    trackid,    speed,  trainid,    ack_no  ]
@@ -97,6 +98,7 @@ def sender(train_table,queue,lock):
     
     #read from queue
     while True:
+        sleep(0.1)
         try:
             queue_empty=0
             data=queue.get(block=False)
