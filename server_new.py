@@ -18,7 +18,7 @@ receiver
 -put the recived data on queue to be read be sender function (which runs a separate process)
 -need to take lock for train_table as it is used by sender function
 '''
-def receiver(train_table,queue,lock):
+def receiver(train_table,queue,pending_ack,lock,ack_lock):
 
     #put our own IP and port on receiver IP and port
     print("receiver started")
@@ -94,6 +94,20 @@ def receiver(train_table,queue,lock):
             #Append train IP and insert in queue
             queue.put(data_new)
 
+        else:
+            ip_addr, port_no = client_address
+            ack_no = data[1]
+            ack_lock.acquire()
+            acked_list = []
+            for ack in pending_ack:
+                #pending_ack is a list which has pending acks
+                #format is [ train_ip_fwd, pikled data, time_ack_sent, ack_no ]
+                if ack[0] == ip_addr & ack[3] == ack_no:
+                    acked_list.append(ack)
+            for ack in acked_list:
+                pending_ack.remove(ack)
+            ack_lock.release()
+
 '''
 sender
 ------------
@@ -101,11 +115,11 @@ sender
 -read data from queue, do a table lookup and forward the data to respective trains
 -need to take lock for train_table as it is used by receiver function
 '''
-def sender(train_table,queue,lock):
+def sender(train_table,queue,pending_ack,lock,ack_lock):
     pending_ack_list=[]
     train_address=0
     queue_empty=0
-    
+    rto = 5 #retransmission timeout
     #read from queue
     while True:
         try:
@@ -124,7 +138,7 @@ def sender(train_table,queue,lock):
             lock.release()
 
             #Forward the data to all trains in the tracks
-            #tuple = [  train_id,   ip_addr,    port_no]
+            #tuple = [  train_id,   ip_addr,    port_no ] #old comment more members might be added
             for train in train_list:
                 if train[0]!=data[3]:
                     train_ip=train[1]
@@ -135,15 +149,34 @@ def sender(train_table,queue,lock):
                     print("sending gps")
                     print(data)
                     packet=pickle.dumps(data)
+
+                    ack_lock.acquire()
+                    #pending_ack is a list which has pending acks
+                    #format is [ train_ip_fwd, pikled data, time_ack_sent, ack_no ]
+                    pending_ack[src_train_id].append([train_ip,packet,time.time(),ack_no])
+                    ack_lock.release()
                     server_socket.sendto(packet, train_address)
+
+        ack_lock.acquire()
+        for ack in pending_ack:
+            if ack[2] - time.time() > rto:
+                train_ip = ack[0]
+                port = 3000
+                train_address=(train_ip,port)
+                packet = ack[1]
+                server_socket.sendto(packet, train_address)
+        ack_lock.release()
+
 
 if __name__ == '__main__':
     queue = Queue()
     manager = Manager()
     lock=Lock()
+    ack_lock=Lock()
     train_table = manager.dict()
+    pending_ack = manager.list()
     receiver_process = Process(target=receiver, args=(train_table,queue,lock))
-    sender_process = Process(target=sender, args=(train_table,queue,lock))
+    sender_process = Process(target=sender, args=(train_table,queue,pending_ack,lock,ack_lock))
     sender_process.start()
     receiver_process.start()
     sender_process.join()
