@@ -51,7 +51,12 @@ def generate_dict():
     my_dict[key] = [gps, track_id]
     
     key = b'61d7'
-    gps = [-78.87,-32.05] 
+    gps = [-78.87,-34.05] 
+    track_id = 7            
+    my_dict[key] = [gps, track_id]
+
+    key = b'61d8'
+    gps = [-78.87,-31.05] 
     track_id = 7            
     my_dict[key] = [gps, track_id]
     
@@ -60,23 +65,24 @@ def rfid_reader(queue):
     generate_dict()
     old_data=''
     file_path = 'dummy_data1.txt'
-    while True:
-        with open(file_path, 'r') as file:
-            for line in file:
-                if "'EPCData':" in line:
-                    # Convert the string representation of the dictionary to an actual dictionary
-                    data_dict = ast.literal_eval(line.strip())
-                    # Extracting the 'EPC' value and return it
-                    data=data_dict['EPCData']['EPC']
+    #while True:
+    with open(file_path, 'r') as file:
+        for line in file:
+            sleep(1)
+            if "'EPCData':" in line:
+                # Convert the string representation of the dictionary to an actual dictionary
+                data_dict = ast.literal_eval(line.strip())
+                # Extracting the 'EPC' value and return it
+                data=data_dict['EPCData']['EPC']
 
-                if data!=old_data:
-                    old_data=data
-                    if data in my_dict:
-                        queue.put(my_dict[data])
-                        print("put data", data)
-                    else:
-                        # Handle the case where data is not in my_dict
-                        print(f"Data {data} not found in my_dict")
+            if data!=old_data:
+                old_data=data
+                if data in my_dict:
+                    queue.put(my_dict[data])
+                    print("put data", data)
+                else:
+                    # Handle the case where data is not in my_dict
+                    print(f"Data {data} not found in my_dict")
 
 
 def sender(queue,shared_gps,lock):
@@ -85,14 +91,15 @@ def sender(queue,shared_gps,lock):
     server_addr = (server_ip, server_port)
 
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
     
     queue_empty=0
     data=[]
     
-    received_ack=0
+    received_ack=1
     ack_no=0
     curr_ack=0
-    rtt_approx=1
+    rtt_approx=100
     speed=100
     train_id=12345
 
@@ -100,6 +107,7 @@ def sender(queue,shared_gps,lock):
         try:
             queue_empty=0
             data = queue.get(block=False)
+            print("received new data")
             lock.acquire()
             shared_gps=data[0]
             lock.release()
@@ -121,6 +129,9 @@ def sender(queue,shared_gps,lock):
             client_socket.settimeout(rtt_approx)
             try:
                 ack_data, server_address = client_socket.recvfrom(1024)
+                ack_data=pickle.loads(ack_data)
+                ack_data=ack_data[0]
+                print(ack_data)
                 if server_address==server_addr and ack_data==curr_ack:
                     received_ack=1
 
