@@ -53,7 +53,7 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
     received_ack=1
     curr_ack=0
     ack_lock.release()
-    rtt_approx=1
+    rtt_approx=5
     speed=100
     train_id=12345
     curr_time=0
