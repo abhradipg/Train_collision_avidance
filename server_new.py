@@ -116,6 +116,7 @@ def sender(train_table,queue,lock):
             #tuple = [  train_id,   ip_addr,    port_no]
             for train in train_list:
                 train_ip=train[1]
+                print(train_ip)
                 train_port=3000
                 train_address=(train_ip,train_port)
                 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

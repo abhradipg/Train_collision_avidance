@@ -122,12 +122,13 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
     forward_train_gps = 0
     train_id=12345
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
     server_socket.bind((server_ip, server_port))
 
     while True:
         data, client_address = server_socket.recvfrom(1024)
+        print("received data")
         segments = pickle.loads(data)
+        print(segments)
         if len(segments)==1:
             ack_no=segments[0]
             print("got ack")
