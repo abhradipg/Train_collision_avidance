@@ -221,18 +221,18 @@ def tcp_server(slowdown,speed_lock):
         data = client_socket.recv(1024)
         if data:
             message = data.decode('utf-8')
-            print(message)
+            #print(message)
             if(message=="slow"):
                 speed_lock.acquire()
                 slowdown.value = 1
                 speed_lock.release()
-                print("Slowing down !!!")
+                print("Train Slowing down !!!")
 
             elif(message=="stop"):
                 speed_lock.acquire()
                 slowdown.value = 2
                 speed_lock.release()
-                print("Braking !!! Dangerously Close")
+                print("Braking !!! Train Dangerously Close")
 
         # Close the connection
         client_socket.close()
