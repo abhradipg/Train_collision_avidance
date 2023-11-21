@@ -123,7 +123,7 @@ def sender(train_table,queue,lock):
                 train_address=(train_ip,train_port)
                 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 print("sending gps")
-                print(packet)
+                print(data)
                 packet=pickle.dumps(data)
                 server_socket.sendto(packet, train_address)
 
