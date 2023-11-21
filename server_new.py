@@ -39,10 +39,11 @@ def receiver(train_table,queue,lock):
         lock.acquire()
         for tid in train_table.keys():
             if tid != track_id:
-                tuple_list = train_table[track_id].copy()
-                for tuple in tuple_list:
-                    if tuple[0] == train_id:
-                        train_table[tid].remove(tuple)
+                if track_id in train_table.keys():
+                    tuple_list = train_table[track_id].copy()
+                    for tuple in tuple_list:
+                        if tuple[0] == train_id:
+                            train_table[tid].remove(tuple)
         lock.release()
 
         tuple = [train_id,ip_addr,port_no]
