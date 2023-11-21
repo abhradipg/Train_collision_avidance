@@ -83,12 +83,19 @@ def receiver(train_table,queue,lock):
         data_new=pickle.dumps(data[0:4])
         queue.put(data_new)
 
-#send data to trains in current tracks and wait for acks back
+'''
+sender
+------------
+-runs as a separate process
+-read data from queue, do a table lookup and forward the data to respective trains
+-need to take lock for train_table as it is used by receiver function
+'''
 def sender(train_table,queue,lock):
     pending_ack_list=[]
     train_address=0
     queue_empty=0
     
+    #read from queue
     while True:
         try:
             queue_empty=0
@@ -105,7 +112,8 @@ def sender(train_table,queue,lock):
             train_list=train_table[trackid]
             lock.release()
 
-            #tuple = [train_id,ip_addr,port_no]
+            #Forward the data to all trains in the tracks
+            #tuple = [  train_id,   ip_addr,    port_no]
             for train in train_list:
                 train_ip=train[1]
                 train_port=3000
