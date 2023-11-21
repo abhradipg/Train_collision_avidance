@@ -17,7 +17,7 @@ my_dict = {}
 def rfid_reader(queue,slowdown,speed_lock):
     my_dict=generate_dict.generate_dict()
     old_data=''
-    file_path = 'dummy_data1.txt'
+    file_path = 'dummy_data2.txt'
     #while True:
     with open(file_path, 'r') as file:
         for line in file:
