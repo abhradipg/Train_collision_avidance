@@ -89,6 +89,14 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
                 send_time = time.time()
                 client_socket.sendto(data, (server_ip, server_port))
 
+def print_metrics(segments,distance):
+    train_id=segments[3]
+    speed=segments[2]
+    print("Train ID: ",train_id," is at location: ",segments[0][0],"\u00B0 N ",segments[0][1],"\u00B0 E")
+    print("Speed of train is: ",speed,"km/hr \n")
+    print("Distance between trains is: ",distance,"km \n")
+
+
 def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
     server_ip = '127.0.0.1'
     server_port = 3000
@@ -113,7 +121,9 @@ def receiver(shared_gps,curr_ack,received_ack,ack_lock,lock):
             ack_message = segments[-1]
             server_socket.sendto(ack_message.encode(), client_address)
             forward_train_gps=segments[0]
-            process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
+            distance=process_data(shared_gps[0],shared_gps[1],forward_train_gps[0],forward_train_gps[1])
+            print_metrics(segments,distance)
+
 
 def process_data(lat1, lon1, lat2, lon2):
     # Convert latitude and longitude from degrees to radians
@@ -130,7 +140,7 @@ def process_data(lat1, lon1, lat2, lon2):
 
     # Calculate the distance
     distance = radius * c
-    print("distance is - "+distance)
+    
     return distance
 
 if __name__ == '__main__':
