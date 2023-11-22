@@ -21,7 +21,7 @@ receiver
 def receiver(train_table,queue,pending_ack,lock,ack_lock):
 
     #put our own IP and port on receiver IP and port
-    #print("receiver started")
+    print("receiver started")
     receiver_ip='10.114.241.211'
     receiver_port=2000
     sender_port=3000
@@ -44,8 +44,8 @@ def receiver(train_table,queue,pending_ack,lock,ack_lock):
         data = pickle.loads(data)
         ip_addr, port_no = client_address
         if ip_addr in train_list:
-            #print("data received by server-")
-            #print(data)
+            print("data received by server-")
+            print(data)
             if len(data) != 2:
                 track_id = data[1] 
                 ip_addr, port_no = client_address
@@ -54,8 +54,8 @@ def receiver(train_table,queue,pending_ack,lock,ack_lock):
 
                 #pikle the ACK and send 
                 ack_no = pickle.dumps(ack_no)
-                #print("sending ack")
-                #print((ip_addr,sender_port))
+                print("sending ack")
+                print((ip_addr,sender_port))
                 receiver_socket.sendto(ack_no, (ip_addr,sender_port))
 
                 #remove the entry if train was present in another track in the table
@@ -65,8 +65,8 @@ def receiver(train_table,queue,pending_ack,lock,ack_lock):
                         tuple_list = train_table[tid].copy()
                         for tuple in tuple_list:
                             if tuple[0] == train_id:
-                                #print(tid)
-                                #print(tuple)
+                                print(tid)
+                                print(tuple)
                                 train_table[tid].remove(tuple)
                 lock.release()
             
@@ -76,8 +76,8 @@ def receiver(train_table,queue,pending_ack,lock,ack_lock):
                 if track_id in train_table.keys():
                     # Key already exists, append value to the existing list
                     if tuple not in train_table[track_id]:
-                        #print(f"Before table: {train_table}")
-                        #print("append")
+                        print(f"Before table: {train_table}")
+                        print("append")
                         train_table[track_id]+=[tuple]
                 else:
                     # Key does not exist, create a new entry with a list containing the value
@@ -85,8 +85,8 @@ def receiver(train_table,queue,pending_ack,lock,ack_lock):
                     train_table[track_id]+=[tuple]
                 lock.release()
 
-                #print(f"Updated table: {train_table}")
-                #print(data)
+                print(f"Updated table: {train_table}")
+                print(data)
 
                 #pikle the data received and put in the queue to be read by sender function
                 data_new=data[0:4]
@@ -98,10 +98,10 @@ def receiver(train_table,queue,pending_ack,lock,ack_lock):
                 queue.put(data_new)
 
             elif len(data)==2:
-                #print("got ack")
-                #print(data)
+                print("got ack")
+                print(data)
                 ip_addr, port_no = client_address
-                #print(ip_addr)
+                print(ip_addr)
                 ack_no = data[0]
                 ack_lock.acquire()
                 acked_list = []
@@ -109,11 +109,11 @@ def receiver(train_table,queue,pending_ack,lock,ack_lock):
                     #pending_ack is a list which has pending acks
                     #format is [ train_ip_fwd, pikled data, time_ack_sent, ack_no ]
                     if ack[0] == ip_addr and str(ack[3]) == str(ack_no):
-                        #print("appended")
+                        print("appended")
                         acked_list.append(ack)
                 for ack in acked_list:
                     pending_ack.remove(ack)
-                #print(pending_ack)
+                print(pending_ack)
                 ack_lock.release()
 
 '''
@@ -136,15 +136,15 @@ def sender(train_table,queue,pending_ack,lock,ack_lock):
             data=queue.get(block=False)
             data = pickle.loads(data)
             ack_no=data[-1]
-            #print("ack no while sending")
-            #print(ack_no)
+            print("ack no while sending")
+            print(ack_no)
 
         except:
             queue_empty=1
 
         if queue_empty==0:
             trackid=data[1]
-            #print(data)
+            print(data)
             lock.acquire()
             train_list=train_table[trackid]
             lock.release()
@@ -154,12 +154,12 @@ def sender(train_table,queue,pending_ack,lock,ack_lock):
             for train in train_list:
                 if train[0]!=data[3]:
                     train_ip=train[1]
-                    #print(train_ip)
+                    print(train_ip)
                     train_port=3000
                     train_address=(train_ip,train_port)
                     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                    #print("sending gps")
-                    #print(data)
+                    print("sending gps")
+                    print(data)
                     packet=pickle.dumps(data)
 
                     ack_lock.acquire()

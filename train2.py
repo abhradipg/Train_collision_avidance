@@ -92,7 +92,7 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
             ack_lock.release()
             send_time=time.time()
             print("sending rfid data")
-            #print(data)
+            print(data)
             data = pickle.dumps(data)
             client_socket.sendto(data, (server_ip, server_port))
         
