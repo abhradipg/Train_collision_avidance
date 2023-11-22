@@ -171,7 +171,7 @@ def print_metrics(segments,distance,speed_lock):
 
 
 def receiver(shared_gps,curr_ack,slowdown,received_ack,ack_lock,lock,speed_lock):
-    server_ip = '10.114.241.236'
+    server_ip = '10.114.241.43'
     #server_ip = '10.192.240.106'
     server_port = 3000
     forward_train_gps = 0
@@ -215,7 +215,7 @@ def receiver(shared_gps,curr_ack,slowdown,received_ack,ack_lock,lock,speed_lock)
             print_metrics(segments,distance,speed_lock)
 
 def tcp_server(slowdown,speed_lock):
-    server_ip='10.114.241.236'
+    server_ip='10.114.241.43'
     server_port=2500
     server_address = (server_ip,server_port)
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
