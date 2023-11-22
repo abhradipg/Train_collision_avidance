@@ -27,7 +27,7 @@ def receiver(train_table,queue,pending_ack,lock,ack_lock):
     sender_port=3000
     receiver_new_data=0
     curr_ack_no=0
-    train_list=['10.114.241.236','10.217.59.100']
+    train_list=['10.114.241.236','10.114.241.208']
    
     #start a UDP socket connection for receiver
     receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
