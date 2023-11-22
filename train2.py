@@ -199,7 +199,7 @@ def receiver(shared_gps,curr_ack,slowdown,received_ack,ack_lock,lock,speed_lock)
             #segment data format [[gps],trackid,speed,train_no,sourceip,ackno]
             ack_message = [segments[-1]]
             ack_message.append(train_id)
-            #print("train ack")
+            print("train ack")
             #print(segments[-1])
             #print(ack_message)
             ack_message = pickle.dumps(ack_message)
