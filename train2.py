@@ -139,10 +139,14 @@ def print_metrics(segments,distance,speed_lock):
         print("Braking !!! Dangerously Close")
         print(server_address)
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect(server_address)
-        message="stop"
-        client_socket.sendall(message.encode('utf-8'))
-        client_socket.close()
+        try:
+            client_socket.connect(server_address)
+            message="stop"
+            client_socket.sendall(message.encode('utf-8'))
+        except Exception as e:
+            print('Error handling client connection:', e)
+        finally:
+            client_socket.close()
 
     elif distance < 1:
         speed_lock.acquire()
@@ -153,9 +157,13 @@ def print_metrics(segments,distance,speed_lock):
             print("Slowing down !!!")
             print(server_address)
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
             client_socket.connect(server_address)
             message="slow"
             client_socket.sendall(message.encode('utf-8'))
+        except Exception as e:
+            print('Error handling client connection:', e)
+        finally:
             client_socket.close()
     
 
