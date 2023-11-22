@@ -139,6 +139,7 @@ def print_metrics(segments,distance,speed_lock):
         print("Braking !!! Dangerously Close")
         print(server_address)
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.setsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY,1)
         try:
             client_socket.connect(server_address)
             message="stop"
@@ -157,6 +158,7 @@ def print_metrics(segments,distance,speed_lock):
             print("Slowing down !!!")
             print(server_address)
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.setsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY,1)
         try:
             client_socket.connect(server_address)
             message="slow"
