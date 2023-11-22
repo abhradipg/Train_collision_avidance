@@ -23,11 +23,11 @@ def rfid_reader(queue,slowdown,speed_lock):
         for line in file:
             speed_lock.acquire()
             if(slowdown.value == 2):
-                sleep(3000)
+                break
             elif slowdown.value == 1:
-                sleep(15)
+                sleep(20)
             else:
-                sleep(5)
+                sleep(6)
             speed_lock.release()
 
             if "'EPCData':" in line:
@@ -47,7 +47,7 @@ def rfid_reader(queue,slowdown,speed_lock):
 
 
 def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
-    server_ip = '10.192.241.200'
+    server_ip = '10.217.58.125'
     server_port = 2000
     server_addr = (server_ip, server_port)
 
@@ -61,7 +61,7 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
     received_ack.value=1
     curr_ack.value=0
     ack_lock.release()
-    rtt_approx=5
+    rtt_approx=4
     speed=100
     train_id=12340
     curr_time=0
@@ -69,7 +69,7 @@ def sender(queue,shared_gps,curr_ack,received_ack,ack_lock,lock):
     ack_no=0
 
     while True:
-        sleep(0.2)
+        sleep(0.1)
         try:
             queue_empty=0
             data = queue.get(block=False)
@@ -162,7 +162,7 @@ def print_metrics(segments,distance,speed_lock):
 
 def receiver(shared_gps,curr_ack,slowdown,received_ack,ack_lock,lock,speed_lock):
     #server_ip = '10.192.241.2'
-    server_ip = '10.192.240.184'
+    server_ip = '10.217.59.100'
     server_port = 3000
     forward_train_gps = 0
     train_id=12340
@@ -181,7 +181,7 @@ def receiver(shared_gps,curr_ack,slowdown,received_ack,ack_lock,lock,speed_lock)
             print("got ack")
             print(ack_no)
             ack_lock.acquire()
-            print(curr_ack)
+            print(curr_ack.value)
             if ack_no==curr_ack.value:
                 received_ack.value=1
             ack_lock.release()
@@ -205,7 +205,7 @@ def receiver(shared_gps,curr_ack,slowdown,received_ack,ack_lock,lock,speed_lock)
             print_metrics(segments,distance,speed_lock)
 
 def tcp_server(slowdown,speed_lock):
-    server_ip='10.192.240.184'
+    server_ip='10.217.59.100'
     server_port=2500
     server_address = (server_ip,server_port)
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

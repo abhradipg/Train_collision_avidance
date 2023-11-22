@@ -22,7 +22,7 @@ def receiver(train_table,queue,lock):
 
     #put our own IP and port on receiver IP and port
     print("receiver started")
-    receiver_ip='10.192.241.200'
+    receiver_ip='10.217.58.125'
     receiver_port=2000
     sender_port=3000
     receiver_new_data=0
